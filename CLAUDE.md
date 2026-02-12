@@ -158,12 +158,15 @@ When the developer types **"menu"**, show the current menu from `docs/MENU.md` u
 2. **Run tests** — Execute all test scripts and show results
 3. **Run project** — Install dependencies, build, and start the project
 
+The last item is always:
+- **Framework Help** — Show a short introduction and overview of the framework: what it does, the key rules, available commands (menu, rules), and how docs files work. This item always stays at the bottom, even when the developer adds new items above it.
+
 ---
 
 ## Git Discipline
 - Commit after each completed task with a clear message tied to the TODO item.
 - Keep commits small and focused — one task per commit.
-- Use the commit message to explain what was done and why.
+- Always show the commit message to the developer before committing. Don't commit silently.
 
 ## Checkpoints
 - Before making a big or risky change, log a checkpoint in `docs/DECISIONS.md`.
