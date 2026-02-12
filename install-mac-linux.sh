@@ -1,43 +1,62 @@
 #!/bin/bash
 
+# Resolve the folder where this script lives (so it works from any directory)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 echo "============================================"
 echo " Claude Code Development Framework Installer"
 echo "============================================"
 echo ""
+echo "This installer copies the framework rules to your"
+echo "global Claude Code config folder (~/.claude/)."
+echo ""
+echo "After install, just run \"claude\" in any project"
+echo "folder and the framework will be active automatically."
+echo ""
+echo "Install location: $HOME/.claude/"
+echo ""
 
-# Check if .claude folder exists
+read -p "Install the framework to ~/.claude/? (y/n): " PROCEED
+if [ "$PROCEED" != "y" ] && [ "$PROCEED" != "Y" ]; then
+    echo ""
+    echo "Installation cancelled."
+    exit 0
+fi
+
+echo ""
+
+# Create .claude folder if needed
 if [ ! -d "$HOME/.claude" ]; then
     mkdir -p "$HOME/.claude"
     echo "Created .claude folder."
-else
-    echo ".claude folder already exists."
 fi
 
-# Check for existing CLAUDE.md
+# Install CLAUDE.md
 if [ -f "$HOME/.claude/CLAUDE.md" ]; then
     echo ""
-    echo "WARNING: CLAUDE.md already exists at $HOME/.claude/CLAUDE.md"
-    read -p "Overwrite? (y/n): " OVERWRITE
-    if [ "$OVERWRITE" != "y" ] && [ "$OVERWRITE" != "Y" ]; then
-        echo "Skipping CLAUDE.md"
+    echo "Framework rules (CLAUDE.md) are already installed."
+    read -p "Overwrite with this version? (y/n): " OVERWRITE_CLAUDE
+    if [ "$OVERWRITE_CLAUDE" != "y" ] && [ "$OVERWRITE_CLAUDE" != "Y" ]; then
+        echo "Keeping existing CLAUDE.md"
     else
-        cp "CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+        cp "$SCRIPT_DIR/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
         echo "Installed CLAUDE.md"
     fi
 else
-    cp "CLAUDE.md" "$HOME/.claude/CLAUDE.md"
+    cp "$SCRIPT_DIR/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
     echo "Installed CLAUDE.md"
 fi
 
-# Check for existing settings.json
+# Install settings.json
 if [ -f "$HOME/.claude/settings.json" ]; then
     echo ""
-    echo "WARNING: settings.json already exists at $HOME/.claude/settings.json"
-    echo "You may want to manually merge the permissions and hooks."
-    echo "A copy has been saved as settings-framework.json for reference."
-    cp "settings.json" "$HOME/.claude/settings-framework.json"
+    echo "Settings file (settings.json) is already installed."
+    echo "You may want to manually merge permissions and hooks."
+    echo "Saving this version as settings-framework.json for reference."
+    cp "$SCRIPT_DIR/settings.json" "$HOME/.claude/settings-framework.json"
+    echo "Saved settings-framework.json"
 else
-    cp "settings.json" "$HOME/.claude/settings.json"
+    cp "$SCRIPT_DIR/settings.json" "$HOME/.claude/settings.json"
     echo "Installed settings.json"
 fi
 
@@ -57,3 +76,4 @@ echo "  3. Tell Claude what you want to build"
 echo "  4. The framework kicks in automatically"
 echo ""
 echo "Templates for docs files are in the templates/ folder."
+echo ""
