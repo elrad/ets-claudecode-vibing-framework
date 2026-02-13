@@ -208,6 +208,41 @@ The last item is always:
 
 ---
 
+## Semantic Memory (Optional)
+
+If the memory server is installed, you have access to a semantic database that persists across all sessions and projects. Use it to build long-term knowledge that goes beyond what docs files capture.
+
+### When to Save Memories
+- **Decisions** (type: `decision`) — non-trivial choices with reasoning, especially cross-project patterns
+- **Errors** (type: `error`) — solved problems with cause and fix, especially tricky or recurring ones
+- **Preferences** (type: `preference`) — developer workflow preferences, style choices, tool preferences
+- **Patterns** (type: `pattern`) — reusable code patterns, architectural approaches, solutions that worked well
+- **Context** (type: `context`) — project background, key relationships, things that take time to re-learn
+
+### When to Search Memory
+- **Session start** — search for memories related to the current project
+- **Before debugging** — search for similar errors before researching from scratch
+- **Before decisions** — search for past decisions on similar topics
+- **When stuck** — search for patterns or context that might help
+
+### Memory Tools
+| Tool | What it does |
+|------|-------------|
+| `memory_save(content, type, tags, project)` | Store a memory with metadata |
+| `memory_search(query, limit)` | Find memories by meaning |
+| `memory_query(type, project, tags, limit)` | Filter by metadata |
+| `memory_list(type, project, limit)` | Browse recent memories |
+| `memory_delete(id)` | Remove a memory |
+
+### Rules
+- Always include the `project` name when saving project-specific memories
+- Keep memory content self-contained — it should make sense without extra context
+- Don't save trivial things — save what's worth remembering across sessions
+- Docs files remain the primary record for each project; memory is supplementary
+- Search memory at session start, but don't overwhelm the context with results
+
+---
+
 ## New Projects
 When starting a new project:
 1. Create `docs/` folder

@@ -62,12 +62,89 @@ fi
 
 echo ""
 echo "============================================"
+echo " Core installation complete!"
+echo "============================================"
+
+# --- Optional: Semantic Memory ---
+echo ""
+echo "--- Optional: Semantic Memory ---"
+echo ""
+echo "The framework can include a semantic memory system that"
+echo "lets Claude remember things across sessions using meaning-based"
+echo "search (not just keywords). Requires Python 3.10+."
+echo ""
+read -p "Install semantic memory? (y/n): " INSTALL_MEMORY
+MEMORY_INSTALLED=false
+
+if [ "$INSTALL_MEMORY" = "y" ] || [ "$INSTALL_MEMORY" = "Y" ]; then
+    echo ""
+    echo "Checking for Python..."
+
+    # Detect python command
+    PYTHON_CMD=""
+    if command -v python3 &>/dev/null; then
+        PYTHON_CMD="python3"
+    elif command -v python &>/dev/null; then
+        PYTHON_CMD="python"
+    fi
+
+    if [ -z "$PYTHON_CMD" ]; then
+        echo "Python not found. Please install Python 3.10+ and try again."
+        echo "Skipping memory setup."
+    else
+        PY_VERSION=$($PYTHON_CMD --version 2>&1)
+        echo "Found $PY_VERSION"
+
+        echo ""
+        echo "Installing Python packages (chromadb, mcp)..."
+        echo "This may take a minute..."
+        if $PYTHON_CMD -m pip install "chromadb>=1.0.0" "mcp>=1.0.0" --quiet 2>/dev/null; then
+            echo "Packages installed."
+
+            # Copy server to ~/.claude/memory/
+            echo ""
+            echo "Setting up memory server..."
+            mkdir -p "$HOME/.claude/memory"
+            cp "$SCRIPT_DIR/memory-server/server.py" "$HOME/.claude/memory/server.py"
+            echo "Copied server to $HOME/.claude/memory/server.py"
+
+            # Register MCP server with Claude Code
+            echo ""
+            echo "Registering memory server with Claude Code..."
+            if command -v claude &>/dev/null; then
+                # Get absolute path to python
+                PYTHON_PATH=$(command -v $PYTHON_CMD)
+                claude mcp add-json memory-server "{\"type\":\"stdio\",\"command\":\"$PYTHON_PATH\",\"args\":[\"$HOME/.claude/memory/server.py\"]}" --scope user 2>/dev/null || \
+                    claude mcp add memory-server --scope user -- "$PYTHON_PATH" "$HOME/.claude/memory/server.py" 2>/dev/null
+                echo "Memory server registered."
+                MEMORY_INSTALLED=true
+                echo ""
+                echo "Semantic memory installed! Claude can now use memory_save,"
+                echo "memory_search, and other memory tools across all projects."
+            else
+                echo "Claude CLI not found in PATH. You can register manually:"
+                echo "  claude mcp add memory-server -- $PYTHON_CMD $HOME/.claude/memory/server.py"
+            fi
+        else
+            echo ""
+            echo "Failed to install Python packages."
+            echo "You can try manually: $PYTHON_CMD -m pip install chromadb mcp"
+            echo "Skipping memory setup."
+        fi
+    fi
+fi
+
+echo ""
+echo "============================================"
 echo " Installation complete!"
 echo "============================================"
 echo ""
 echo "What was installed:"
 echo "  $HOME/.claude/CLAUDE.md     (framework rules)"
 echo "  $HOME/.claude/settings.json (permissions and hooks)"
+if [ "$MEMORY_INSTALLED" = true ]; then
+    echo "  $HOME/.claude/memory/       (semantic memory server)"
+fi
 echo ""
 echo "To start using it:"
 echo "  1. Open a terminal in any project folder"

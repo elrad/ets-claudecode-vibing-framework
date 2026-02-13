@@ -129,6 +129,46 @@ Claude saves everything before the session ends or context runs out. Nothing is 
 
 ---
 
+## Semantic Memory (Optional)
+
+The framework can optionally include a semantic memory system — a local database that lets Claude find relevant knowledge by **meaning**, not just keywords.
+
+### What it does
+- Stores memories (decisions, errors, preferences, patterns, context) in a local database
+- Finds relevant memories using semantic search — "authentication timeout issue" finds memories about "login session expiry"
+- Works across all projects and sessions
+- Runs entirely on your machine — no data leaves your computer
+
+### How to install
+The installer asks if you want to set it up. You need:
+- **Python 3.10+** installed
+- That's it — the installer handles the rest (installs packages, copies the server, registers it with Claude)
+
+### How Claude uses it
+- **Session start** — searches for memories related to the current project
+- **Before debugging** — checks if a similar error was solved before
+- **After solving problems** — saves the solution for next time
+- **Decisions** — remembers why things were chosen
+
+### Memory tools available to Claude
+| Tool | What it does |
+|------|-------------|
+| `memory_save` | Store a memory with type, tags, and project |
+| `memory_search` | Find memories by meaning |
+| `memory_query` | Filter by type, project, or tags |
+| `memory_list` | Browse recent memories |
+| `memory_delete` | Remove a memory |
+
+### Manual install
+If you skipped it during install, you can set it up later:
+```bash
+pip install chromadb mcp
+cp memory-server/server.py ~/.claude/memory/server.py
+claude mcp add memory-server -- python ~/.claude/memory/server.py
+```
+
+---
+
 ## Errors as Knowledge
 
 Unlike a traditional bug log, ERRORS.md is a **knowledge base**. Entries look like:
@@ -215,6 +255,9 @@ framework-package/
     STRUCTURE.md
     CHANGELOG.md
     MENU.md
+  memory-server/         -- Semantic memory MCP server (optional)
+    server.py
+    requirements.txt
 ```
 
 ---
@@ -223,4 +266,5 @@ framework-package/
 
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and configured
 - A terminal (Command Prompt, PowerShell, Terminal, etc.)
+- **Optional:** Python 3.10+ (only needed for semantic memory)
 - That's it
